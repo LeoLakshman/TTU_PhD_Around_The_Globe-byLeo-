@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { margin: 0; }
+    #globeViz { width: 100vw; height: 100vh; }
+
+    /* Elegant tooltip styling */
+    .globe-tooltip {
+      background: rgba(0, 0, 0, 0.85);
+      color: #ffd700; /* Gold color for elegance */
+      padding: 8px 15px;
+      border-radius: 5px;
+      font-family: 'Playfair Display', serif; /* Elegant font */
+      font-size: 20px; /* Larger, refined text */
+      text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); /* Subtle glow */
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out; /* Smooth fade */
+    }
+    .globe-tooltip.visible {
+      opacity: 1;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <script src="//unpkg.com/globe.gl"></script>
+</head>
+<body>
+  <div id="globeViz"></div>
+
+  <script>
+    // Country coordinates (capital cities or representative locations)
+    const countryData = [
+      { name: "Bangladesh", lat: 23.6850, lng: 90.3563 }, // Dhaka
+      { name: "China", lat: 39.9042, lng: 116.4074 },     // Beijing
+      { name: "Nepal", lat: 27.7172, lng: 85.3240 },      // Kathmandu
+      { name: "India", lat: 28.6139, lng: 77.2090 },      // New Delhi
+      { name: "Iran", lat: 35.6892, lng: 51.3890 },       // Tehran
+      { name: "Vietnam", lat: 21.0278, lng: 105.8342 },   // Hanoi
+      { name: "Liberia", lat: 6.3156, lng: -10.8074 },    // Monrovia
+      { name: "Ireland", lat: 53.3498, lng: -6.2603 },    // Dublin
+      { name: "Nigeria", lat: 9.0820, lng: 8.6753 },      // Abuja
+      { name: "Pakistan", lat: 33.6844, lng: 73.0479 },   // Islamabad
+      { name: "Domestic", lat: 38.9072, lng: -77.0369 },  // Washington, D.C.
+      { name: "Afghanistan", lat: 34.5553, lng: 69.2075 },// Kabul
+      { name: "Ghana", lat: 5.6037, lng: -0.1870 },       // Accra
+      { name: "Sri Lanka", lat: 6.9271, lng: 79.8612 },   // Colombo
+      { name: "Cameroon", lat: 3.8480, lng: 11.5021 },    // Yaoundé
+      { name: "Zimbabwe", lat: -17.8252, lng: 31.0335 },  // Harare
+      { name: "USA", lat: 40.7128, lng: -74.0060 }        // New York City (for "NA" and "USA")
+    ];
+
+    // Initialize the globe
+    const myGlobe = Globe()
+      (document.getElementById('globeViz'))
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+      .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+      .labelsData(countryData)
+      .labelLat(d => d.lat)
+      .labelLng(d => d.lng)
+      .labelText(d => d.name)
+      .labelSize(0) // Hide labels by default
+      .labelDotRadius(0.6) // Elegant dot size
+      .labelColor(() => 'rgba(255, 215, 0, 0.75)') // Gold color for dots
+      .labelAltitude(0.02)
+      .labelLabel(d => `
+        <div class="globe-tooltip">${d.name}</div>
+      `) // Elegant tooltip
+      .onLabelHover((label) => {
+        const tooltip = document.querySelector('.globe-tooltip');
+        if (tooltip) {
+          tooltip.classList.toggle('visible', !!label);
+        }
+      })
+      .onLabelClick((label) => {
+        // Redirect, mapping "NA" to "USA"
+        const redirectName = (label.name === "NA") ? "USA" : label.name;
+        window.location.href = `country.html?country=${encodeURIComponent(redirectName)}`;
+      });
+  </script>
+</body>
+</html>
