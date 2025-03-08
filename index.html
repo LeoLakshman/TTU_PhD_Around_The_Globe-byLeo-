@@ -1,82 +1,127 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <title>PhD Applicants by Country</title>
   <style>
-    body { margin: 0; }
-    #globeViz { width: 100vw; height: 100vh; }
-
-    /* Elegant tooltip styling */
-    .globe-tooltip {
-      background: rgba(0, 0, 0, 0.85);
-      color: #ffd700; /* Gold color for elegance */
-      padding: 8px 15px;
-      border-radius: 5px;
-      font-family: 'Playfair Display', serif; /* Elegant font */
-      font-size: 20px; /* Larger, refined text */
-      text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); /* Subtle glow */
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.3s ease-in-out; /* Smooth fade */
+    body {
+      margin: 0;
+      font-family: 'Playfair Display', serif;
+      min-height: 100vh;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-y: auto;
     }
-    .globe-tooltip.visible {
+    .container {
+      text-align: center;
+      color: #fff;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 48px;
+      color: #ffd700;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+      margin-bottom: 30px;
+    }
+    .country-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .country-button {
+      position: relative;
+      background: rgba(0, 0, 0, 0.85);
+      color: #ffd700;
+      padding: 12px 20px;
+      border: 2px solid #ffd700;
+      border-radius: 5px;
+      font-size: 20px;
+      text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .country-button:hover {
+      background: rgba(255, 215, 0, 0.2);
+      transform: scale(1.05);
+    }
+    .flag-tooltip {
+      position: absolute;
+      top: 50%;
+      left: 100%;
+      transform: translateY(-50%);
+      margin-left: 10px;
+      background: rgba(0, 0, 0, 0.85);
+      padding: 5px;
+      border-radius: 5px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease-in-out;
+      z-index: 10;
+    }
+    .country-button:hover .flag-tooltip {
       opacity: 1;
+    }
+    .flag-tooltip img {
+      width: 60px;
+      height: auto;
+      border-radius: 3px;
     }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-  <script src="//unpkg.com/globe.gl"></script>
 </head>
 <body>
-  <div id="globeViz"></div>
+  <div class="container">
+    <h1>PhD Applicants by Country</h1>
+    <div class="country-list" id="countryList"></div>
+  </div>
 
   <script>
-    // Country coordinates (capital cities or representative locations)
     const countryData = [
-      { name: "Bangladesh", lat: 23.6850, lng: 90.3563 }, // Dhaka
-      { name: "China", lat: 39.9042, lng: 116.4074 },     // Beijing
-      { name: "Nepal", lat: 27.7172, lng: 85.3240 },      // Kathmandu
-      { name: "India", lat: 28.6139, lng: 77.2090 },      // New Delhi
-      { name: "Iran", lat: 35.6892, lng: 51.3890 },       // Tehran
-      { name: "Vietnam", lat: 21.0278, lng: 105.8342 },   // Hanoi
-      { name: "Liberia", lat: 6.3156, lng: -10.8074 },    // Monrovia
-      { name: "Ireland", lat: 53.3498, lng: -6.2603 },    // Dublin
-      { name: "Nigeria", lat: 9.0820, lng: 8.6753 },      // Abuja
-      { name: "Pakistan", lat: 33.6844, lng: 73.0479 },   // Islamabad
-      { name: "Domestic", lat: 44.9672, lng: -103.7716 },  // Belle Fourche, South Dakota
-      { name: "Afghanistan", lat: 34.5553, lng: 69.2075 },// Kabul
-      { name: "Ghana", lat: 5.6037, lng: -0.1870 },       // Accra
-      { name: "Sri Lanka", lat: 6.9271, lng: 79.8612 },   // Colombo
-      { name: "Cameroon", lat: 3.8480, lng: 11.5021 },    // Yaoundé
-      { name: "Zimbabwe", lat: -17.8252, lng: 31.0335 },  // Harare
-      { name: "USA", lat: 40.7128, lng: -74.0060 }        // New York City (for "NA" and "USA")
+      { name: "Bangladesh", code: "bd" },
+      { name: "China", code: "cn" },
+      { name: "Nepal", code: "np" },
+      { name: "India", code: "in" },
+      { name: "Iran", code: "ir" },
+      { name: "Vietnam", code: "vn" },
+      { name: "Liberia", code: "lr" },
+      { name: "Ireland", code: "ie" },
+      { name: "Nigeria", code: "ng" },
+      { name: "Pakistan", code: "pk" },
+      { name: "Domestic", code: "us" },
+      { name: "Afghanistan", code: "af" },
+      { name: "Ghana", code: "gh" },
+      { name: "Sri Lanka", code: "lk" },
+      { name: "Cameroon", code: "cm" },
+      { name: "Zimbabwe", code: "zw" },
+      { name: "USA", code: "us" }
     ];
 
-    // Initialize the globe
-    const myGlobe = Globe()
-      (document.getElementById('globeViz'))
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-      .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
-      .labelsData(countryData)
-      .labelLat(d => d.lat)
-      .labelLng(d => d.lng)
-      .labelText(d => d.name)
-      .labelSize(0) // Hide labels by default
-      .labelDotRadius(0.6) // Elegant dot size
-      .labelColor(() => 'rgba(255, 215, 0, 0.75)') // Gold color for dots
-      .labelAltitude(0.02)
-      .labelLabel(d => `
-        <div class="globe-tooltip">${d.name}</div>
-      `) // Elegant tooltip
-      .onLabelHover((label) => {
-        const tooltip = document.querySelector('.globe-tooltip');
-        if (tooltip) { 
-          tooltip.classList.toggle('visible', !!label);
-        }
-      })
-      .onLabelClick((label) => {
-        // Redirect, mapping "NA" to "USA"
-        const redirectName = (label.name === "NA") ? "USA" : label.name;
+    const countryList = document.getElementById('countryList');
+
+    countryData.forEach(country => {
+      const button = document.createElement('button');
+      button.className = 'country-button';
+      button.textContent = country.name;
+
+      const tooltip = document.createElement('div');
+      tooltip.className = 'flag-tooltip';
+      const flagImg = document.createElement('img');
+      flagImg.src = `https://flagcdn.com/w80/${country.code}.png`;
+      flagImg.alt = `${country.name} flag`;
+      tooltip.appendChild(flagImg);
+
+      button.appendChild(tooltip);
+
+      button.addEventListener('click', () => {
+        const redirectName = (country.name === "NA") ? "USA" : country.name;
         window.location.href = `country.html?country=${encodeURIComponent(redirectName)}`;
       });
+
+      countryList.appendChild(button);
+    });
   </script>
 </body>
 </html>
