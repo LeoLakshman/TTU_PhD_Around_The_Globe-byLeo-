@@ -91,12 +91,20 @@
 
       // Fetch and display applicant data
       fetch('PhD_Applications.json')
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
         .then(applicants => {
-          const countryApplicants = applicants.filter(a => 
-            a["Citizenship Country"] === decodedCountry || 
-            (a["Citizenship Country"] === "NA" && decodedCountry === "USA")
-          );
+          console.log('Fetched applicants:', applicants); // Debug: Check data
+          const countryApplicants = applicants.filter(a => {
+            const citizenship = a["Citizenship Country"].trim(); // Remove extra spaces
+            return citizenship === decodedCountry || 
+                   (citizenship === "NA" && decodedCountry === "USA");
+          });
+          console.log('Filtered applicants:', countryApplicants); // Debug: Check filter
           const applicantList = document.getElementById('applicantList');
           if (countryApplicants.length > 0) {
             applicantList.innerHTML = countryApplicants.map(applicant => `
@@ -136,7 +144,7 @@
         })
         .catch(error => {
           console.error('Error fetching applicants:', error);
-          document.getElementById('applicantList').innerHTML = "<p>Error loading applicant data.</p>";
+          document.getElementById('applicantList').innerHTML = `<p>Error loading applicant data: ${error.message}</p>`;
         });
     } else {
       document.getElementById('countryName').textContent = "Unknown Country";
