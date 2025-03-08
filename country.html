@@ -7,34 +7,34 @@
     body {
       margin: 0;
       font-family: 'Playfair Display', serif;
-      background: #1a1a1a; /* Dark background for contrast */
-      color: #fff;
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       position: relative;
       overflow: hidden;
+      background: #1a1a1a; /* Fallback dark background */
     }
 
-    /* Background country name */
-    .background-text {
+    /* Flag background */
+    .flag-background {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 15vw; /* Responsive size */
-      color: rgba(255, 215, 0, 0.1); /* Gold with low opacity */
-      text-transform: uppercase;
-      font-weight: 700;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0.3; /* Semi-transparent flag */
       z-index: 0;
-      white-space: nowrap;
+      filter: blur(5px); /* Slight blur for elegance */
     }
 
     /* Foreground content */
     .content {
       z-index: 1;
       text-align: center;
+      color: #fff;
     }
     h1 {
       font-size: 48px;
@@ -52,7 +52,7 @@
   </style>
 </head>
 <body>
-  <div class="background-text" id="backgroundCountry"></div>
+  <div class="flag-background" id="flagBackground"></div>
   <div class="content">
     <h1>Applicants from <span id="countryName"></span></h1>
     <div id="applicantList">
@@ -61,6 +61,14 @@
   </div>
 
   <script>
+    // Country code mapping for flag URLs (ISO 3166-1 alpha-2)
+    const countryCodes = {
+      "Bangladesh": "bd", "China": "cn", "Nepal": "np", "India": "in", "Iran": "ir",
+      "Vietnam": "vn", "Liberia": "lr", "Ireland": "ie", "Nigeria": "ng", "Pakistan": "pk",
+      "Domestic": "us", "Afghanistan": "af", "Ghana": "gh", "Sri Lanka": "lk", 
+      "Cameroon": "cm", "Zimbabwe": "zw", "USA": "us"
+    };
+
     const urlParams = new URLSearchParams(window.location.search);
     let country = urlParams.get('country');
 
@@ -72,10 +80,17 @@
     if (country) {
       const decodedCountry = decodeURIComponent(country);
       document.getElementById('countryName').textContent = decodedCountry;
-      document.getElementById('backgroundCountry').textContent = decodedCountry;
+
+      // Set flag background using flagcdn.com
+      const countryCode = countryCodes[decodedCountry];
+      if (countryCode) {
+        document.getElementById('flagBackground').style.backgroundImage = 
+          `url('https://flagcdn.com/w2560/${countryCode}.jpg')`;
+      } else {
+        console.warn(`No flag found for ${decodedCountry}`);
+      }
     } else {
       document.getElementById('countryName').textContent = "Unknown Country";
-      document.getElementById('backgroundCountry').textContent = "Unknown";
     }
 
     console.log(`Load applicant data for: ${country}`);
