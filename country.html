@@ -13,10 +13,8 @@
       align-items: center;
       position: relative;
       overflow: hidden;
-      background: #1a1a1a; /* Fallback dark background */
+      background: #1a1a1a;
     }
-
-    /* Flag background */
     .flag-background {
       position: absolute;
       top: 0;
@@ -25,21 +23,21 @@
       height: 100%;
       background-size: cover;
       background-position: center;
-      opacity: 0.3; /* Semi-transparent flag */
+      opacity: 0.3;
       z-index: 0;
-      filter: blur(5px); /* Slight blur for elegance */
+      filter: blur(5px);
     }
-
-    /* Foreground content */
     .content {
       z-index: 1;
       text-align: center;
       color: #fff;
+      max-width: 800px;
+      width: 90%;
     }
     h1 {
       font-size: 48px;
-      color: #ffd700; /* Gold color */
-      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); /* Glow effect */
+      color: #ffd700;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
       margin-bottom: 20px;
     }
     #applicantList {
@@ -47,32 +45,37 @@
       background: rgba(0, 0, 0, 0.7);
       padding: 20px;
       border-radius: 10px;
-      max-width: 600px;
+      text-align: left;
     }
+    .applicant {
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+    }
+    .applicant:last-child { border-bottom: none; }
+    .field {
+      margin: 5px 0;
+    }
+    .field strong { color: #ffd700; }
   </style>
 </head>
 <body>
   <div class="flag-background" id="flagBackground"></div>
   <div class="content">
     <h1>Applicants from <span id="countryName"></span></h1>
-    <div id="applicantList">
-      <p>This is a placeholder page. Add applicant data for this country here.</p>
-    </div>
+    <div id="applicantList"></div>
   </div>
 
   <script>
-    // Country code mapping for flag URLs (ISO 3166-1 alpha-2)
     const countryCodes = {
       "Bangladesh": "bd", "China": "cn", "Nepal": "np", "India": "in", "Iran": "ir",
       "Vietnam": "vn", "Liberia": "lr", "Ireland": "ie", "Nigeria": "ng", "Pakistan": "pk",
-      "Domestic": "us", "Afghanistan": "af", "Ghana": "gh", "Sri Lanka": "lk", 
+      "Domestic": "us", "Afghanistan": "af", "Ghana": "gh", "Sri Lanka": "lk",
       "Cameroon": "cm", "Zimbabwe": "zw", "USA": "us"
     };
 
     const urlParams = new URLSearchParams(window.location.search);
     let country = urlParams.get('country');
-
-    // Map "NA" to "USA"
     if (country === "NA") {
       country = "USA";
     }
@@ -80,20 +83,65 @@
     if (country) {
       const decodedCountry = decodeURIComponent(country);
       document.getElementById('countryName').textContent = decodedCountry;
-
-      // Set flag background using flagcdn.com
       const countryCode = countryCodes[decodedCountry];
       if (countryCode) {
         document.getElementById('flagBackground').style.backgroundImage = 
           `url('https://flagcdn.com/w2560/${countryCode}.jpg')`;
-      } else {
-        console.warn(`No flag found for ${decodedCountry}`);
       }
+
+      // Fetch and display applicant data
+      fetch('applicants.json')
+        .then(response => response.json())
+        .then(applicants => {
+          const countryApplicants = applicants.filter(a => 
+            a["Citizenship Country"] === decodedCountry || 
+            (a["Citizenship Country"] === "NA" && decodedCountry === "USA")
+          );
+          const applicantList = document.getElementById('applicantList');
+          if (countryApplicants.length > 0) {
+            applicantList.innerHTML = countryApplicants.map(applicant => `
+              <div class="applicant">
+                <div class="field"><strong>Application ID:</strong> ${applicant["Application ID"]}</div>
+                <div class="field"><strong>Intended Term:</strong> ${applicant["Intended Term"]}</div>
+                <div class="field"><strong>Program Name:</strong> ${applicant["Program Name"]}</div>
+                <div class="field"><strong>Student Type:</strong> ${applicant["Student Type"]}</div>
+                <div class="field"><strong>Applicant Type:</strong> ${applicant["Applicant Type"]}</div>
+                <div class="field"><strong>Review Date:</strong> ${applicant["Review Date"] || "N/A"}</div>
+                <div class="field"><strong>Delivery Type:</strong> ${applicant["Application.Delivery Type"]}</div>
+                <div class="field"><strong>Education History:</strong>
+                  <ul>
+                    ${applicant["Education History"].map((edu, i) => edu ? `
+                      <li>
+                        Institution ${i + 1}: ${edu.Institution}, 
+                        GPA: ${edu.GPA || "N/A"}, 
+                        Degree: ${edu.Degree || "N/A"}, 
+                        Subject: ${edu["Subject Area"] || "N/A"}
+                      </li>
+                    ` : "").join('')}
+                  </ul>
+                </div>
+                <div class="field"><strong>GRE Scores:</strong> 
+                  Verbal: ${applicant["GRE Scores"].Verbal || "N/A"}, 
+                  Quantitative: ${applicant["GRE Scores"].Quantitative || "N/A"}
+                </div>
+                <div class="field"><strong>English Proficiency:</strong> 
+                  ${applicant["English Proficiency"]["Test Type"] || "N/A"}: 
+                  ${applicant["English Proficiency"].Score || "N/A"}
+                </div>
+              </div>
+            `).join('');
+          } else {
+            applicantList.innerHTML = "<p>No applicants found for this country.</p>";
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching applicants:', error);
+          document.getElementById('applicantList').innerHTML = "<p>Error loading applicant data.</p>";
+        });
     } else {
       document.getElementById('countryName').textContent = "Unknown Country";
+      document.getElementById('applicantList').innerHTML = "<p>No country selected.</p>";
     }
-
-    console.log(`Load applicant data for: ${country}`);
   </script>
 </body>
 </html>
