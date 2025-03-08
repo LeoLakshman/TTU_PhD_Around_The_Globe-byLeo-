@@ -7,16 +7,12 @@
     body {
       margin: 0;
       font-family: 'Playfair Display', serif;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      overflow: hidden;
+      min-height: 100vh; /* Changed from height to min-height */
       background: #1a1a1a;
+      overflow-y: auto; /* Enable vertical scrolling */
     }
     .flag-background {
-      position: absolute;
+      position: fixed; /* Changed to fixed to stay as background */
       top: 0;
       left: 0;
       width: 100%;
@@ -33,6 +29,8 @@
       color: #fff;
       max-width: 800px;
       width: 90%;
+      margin: 20px auto; /* Add margin for spacing from top/bottom */
+      padding-bottom: 20px; /* Ensure content isn’t cut off at bottom */
     }
     h1 {
       font-size: 48px;
@@ -98,13 +96,13 @@
           return response.json();
         })
         .then(applicants => {
-          console.log('Fetched applicants:', applicants); // Debug: Check data
+          console.log('Fetched applicants:', applicants);
           const countryApplicants = applicants.filter(a => {
-            const citizenship = a["Citizenship Country"].trim(); // Remove extra spaces
+            const citizenship = a["Citizenship Country"].trim();
             return citizenship === decodedCountry || 
                    (citizenship === "NA" && decodedCountry === "USA");
           });
-          console.log('Filtered applicants:', countryApplicants); // Debug: Check filter
+          console.log('Filtered applicants:', countryApplicants);
           const applicantList = document.getElementById('applicantList');
           if (countryApplicants.length > 0) {
             applicantList.innerHTML = countryApplicants.map(applicant => `
