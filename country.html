@@ -118,23 +118,37 @@
                 <div class="field"><strong>Delivery Type:</strong> ${applicant["Application.Delivery Type"]}</div>
                 <div class="field"><strong>Education History:</strong>
                   <ul>
-                    ${applicant["Education History"].map((edu, i) => edu ? `
+                    <li>
+                      Institution 1: ${applicant["Institution 1"] !== "NA" ? applicant["Institution 1"] : "N/A"}, 
+                      GPA: ${applicant["GPA"] !== "NA" ? applicant["GPA"] : "N/A"}, 
+                      Degree: ${applicant["Degree"] !== "NA" ? applicant["Degree"] : "N/A"}, 
+                      Subject: ${applicant["Subject Area"] !== "NA" ? applicant["Subject Area"] : "N/A"}
+                    </li>
+                    ${applicant["Institution 2"] !== "NA" ? `
                       <li>
-                        Institution ${i + 1}: ${edu.Institution}, 
-                        GPA: ${edu.GPA || "N/A"}, 
-                        Degree: ${edu.Degree || "N/A"}, 
-                        Subject: ${edu["Subject Area"] || "N/A"}
+                        Institution 2: ${applicant["Institution 2"]}, 
+                        GPA: ${applicant["GPA 2"] !== "NA" ? applicant["GPA 2"] : "N/A"}, 
+                        Degree: ${applicant["Degree 2"] !== "NA" ? applicant["Degree 2"] : "N/A"}, 
+                        Subject: ${applicant["Subject Area 2"] !== "NA" ? applicant["Subject Area 2"] : "N/A"}
                       </li>
-                    ` : "").join('')}
+                    ` : ""}
+                    ${applicant["Institution 3"] && applicant["Institution 3"] !== "NA" ? `
+                      <li>
+                        Institution 3: ${applicant["Institution 3"]}, 
+                        GPA: ${applicant["GPA 3"] || "N/A"}, 
+                        Degree: ${applicant["Degree 3"] || "N/A"}, 
+                        Subject: ${applicant["Subject Area 3"] || "N/A"}
+                      </li>
+                    ` : ""}
                   </ul>
                 </div>
                 <div class="field"><strong>GRE Scores:</strong> 
-                  Verbal: ${applicant["GRE Scores"].Verbal || "N/A"}, 
-                  Quantitative: ${applicant["GRE Scores"].Quantitative || "N/A"}
+                  Verbal: ${applicant["GRE Verbal"] !== "NA" ? applicant["GRE Verbal"] : "N/A"}, 
+                  Quantitative: ${applicant["GRE Quantitative"] !== "NA" ? applicant["GRE Quantitative"] : "N/A"}
                 </div>
                 <div class="field"><strong>English Proficiency:</strong> 
-                  ${applicant["English Proficiency"]["Test Type"] || "N/A"}: 
-                  ${applicant["English Proficiency"].Score || "N/A"}
+                  ${applicant["English Proficiency"] !== "NA" ? applicant["English Proficiency"] : "N/A"}: 
+                  ${applicant["Score"] !== "NA" ? applicant["Score"] : "N/A"}
                 </div>
               </div>
             `).join('');
