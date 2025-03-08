@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Country Applicants</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Playfair Display', serif;
+      background: #1a1a1a; /* Dark background for contrast */
+      color: #fff;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background country name */
+    .background-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 15vw; /* Responsive size */
+      color: rgba(255, 215, 0, 0.1); /* Gold with low opacity */
+      text-transform: uppercase;
+      font-weight: 700;
+      z-index: 0;
+      white-space: nowrap;
+    }
+
+    /* Foreground content */
+    .content {
+      z-index: 1;
+      text-align: center;
+    }
+    h1 {
+      font-size: 48px;
+      color: #ffd700; /* Gold color */
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); /* Glow effect */
+      margin-bottom: 20px;
+    }
+    #applicantList {
+      font-size: 18px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 600px;
+    }
+  </style>
+</head>
+<body>
+  <div class="background-text" id="backgroundCountry"></div>
+  <div class="content">
+    <h1>Applicants from <span id="countryName"></span></h1>
+    <div id="applicantList">
+      <p>This is a placeholder page. Add applicant data for this country here.</p>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    let country = urlParams.get('country');
+
+    // Map "NA" to "USA"
+    if (country === "NA") {
+      country = "USA";
+    }
+
+    if (country) {
+      const decodedCountry = decodeURIComponent(country);
+      document.getElementById('countryName').textContent = decodedCountry;
+      document.getElementById('backgroundCountry').textContent = decodedCountry;
+    } else {
+      document.getElementById('countryName').textContent = "Unknown Country";
+      document.getElementById('backgroundCountry').textContent = "Unknown";
+    }
+
+    console.log(`Load applicant data for: ${country}`);
+  </script>
+</body>
+</html>
