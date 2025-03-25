@@ -1,167 +1,186 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Country Applicants</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Playfair Display', serif;
-      min-height: 100vh; /* Changed from height to min-height */
-      background: #1a1a1a;
-      overflow-y: auto; /* Enable vertical scrolling */
-    }
-    .flag-background {
-      position: fixed; /* Changed to fixed to stay as background */
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-size: cover;
-      background-position: center;
-      opacity: 0.3;
-      z-index: 0;
-      filter: blur(5px);
-    }
-    .content {
-      z-index: 1;
-      text-align: center;
-      color: #fff;
-      max-width: 800px;
-      width: 90%;
-      margin: 20px auto; /* Add margin for spacing from top/bottom */
-      padding-bottom: 20px; /* Ensure content isn’t cut off at bottom */
-    }
-    h1 {
-      font-size: 48px;
-      color: #ffd700;
-      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-      margin-bottom: 20px;
-    }
-    #applicantList {
-      font-size: 18px;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 20px;
-      border-radius: 10px;
-      text-align: left;
-    }
-    .applicant {
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid rgba(255, 215, 0, 0.3);
-    }
-    .applicant:last-child { border-bottom: none; }
-    .field {
-      margin: 5px 0;
-    }
-    .field strong { color: #ffd700; }
-  </style>
+    <title>Country Applicants Statistics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Playfair Display', serif;
+            min-height: 100vh;
+            background: #1a1a1a;
+            color: #fff;
+            overflow-y: auto;
+        }
+
+        .flag-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+            z-index: 0;
+            filter: blur(5px);
+        }
+
+        .content {
+            z-index: 1;
+            text-align: center;
+            max-width: 800px;
+            width: 90%;
+            margin: 20px auto;
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 48px;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+        #statistics {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .statistic {
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .statistic:last-child {
+            border-bottom: none;
+        }
+
+        .statistic strong {
+            color: #ffd700;
+        }
+
+        #applicantList {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .applicant {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .applicant:last-child {
+            border-bottom: none;
+        }
+
+        .field {
+            margin: 5px 0;
+        }
+
+        .field strong {
+            color: #ffd700;
+        }
+    </style>
 </head>
 <body>
-  <div class="flag-background" id="flagBackground"></div>
-  <div class="content">
-    <h1>Applicants from <span id="countryName"></span></h1>
-    <div id="applicantList"></div>
-  </div>
+    <div class="flag-background" id="flagBackground"></div>
+    <div class="content">
+        <h1>Applicants from <span id="countryName"></span></h1>
+        <div id="statistics"></div>
+        <div id="applicantList"></div>
+    </div>
 
-  <script>
-    const countryCodes = {
-      "Bangladesh": "bd", "China": "cn", "Nepal": "np", "India": "in", "Iran": "ir",
-      "Vietnam": "vn", "Liberia": "lr", "Ireland": "ie", "Nigeria": "ng", "Pakistan": "pk",
-      "Domestic": "us", "Afghanistan": "af", "Ghana": "gh", "Sri Lanka": "lk",
-      "Cameroon": "cm", "Zimbabwe": "zw", "USA": "us"
-    };
+    <script>
+        const countryCodes = {
+            "Bangladesh": "bd", "China": "cn", "Nepal": "np", "India": "in", "Iran": "ir",
+            "Vietnam": "vn", "Liberia": "lr", "Ireland": "ie", "Nigeria": "ng", "Pakistan": "pk",
+            "Domestic": "us", "Afghanistan": "af", "Ghana": "gh", "Sri Lanka": "lk",
+            "Cameroon": "cm", "Zimbabwe": "zw", "USA": "us"
+        };
 
-    const urlParams = new URLSearchParams(window.location.search);
-    let country = urlParams.get('country');
-    if (country === "NA") {
-      country = "USA";
-    }
+        const urlParams = new URLSearchParams(window.location.search);
+        let country = urlParams.get('country');
+        if (country === "NA") {
+            country = "USA";
+        }
 
-    if (country) {
-      const decodedCountry = decodeURIComponent(country);
-      document.getElementById('countryName').textContent = decodedCountry;
-      const countryCode = countryCodes[decodedCountry];
-      if (countryCode) {
-        document.getElementById('flagBackground').style.backgroundImage = 
-          `url('https://flagcdn.com/w2560/${countryCode}.jpg')`;
-      }
+        if (country) {
+            const decodedCountry = decodeURIComponent(country);
+            document.getElementById('countryName').textContent = decodedCountry;
+            const countryCode = countryCodes[decodedCountry];
+            if (countryCode) {
+                document.getElementById('flagBackground').style.backgroundImage =
+                    `url('https://flagcdn.com/w2560/${countryCode}.jpg')`;
+            }
 
-      // Fetch and display applicant data
-      fetch('PhD_Applications.json')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then(applicants => {
-          console.log('Fetched applicants:', applicants);
-          const countryApplicants = applicants.filter(a => {
-            const citizenship = a["Citizenship Country"].trim();
-            return citizenship === decodedCountry || 
-                   (citizenship === "NA" && decodedCountry === "USA");
-          });
-          console.log('Filtered applicants:', countryApplicants);
-          const applicantList = document.getElementById('applicantList');
-          if (countryApplicants.length > 0) {
-            applicantList.innerHTML = countryApplicants.map(applicant => `
-              <div class="applicant">
-                <div class="field"><strong>Application ID:</strong> ${applicant["Application ID"]}</div>
-                <div class="field"><strong>Intended Term:</strong> ${applicant["Intended Term"]}</div>
-                <div class="field"><strong>Program Name:</strong> ${applicant["Program Name"]}</div>
-                <div class="field"><strong>Student Type:</strong> ${applicant["Student Type"]}</div>
-                <div class="field"><strong>Applicant Type:</strong> ${applicant["Applicant Type"]}</div>
-                <div class="field"><strong>Review Date:</strong> ${applicant["Review Date"] || "N/A"}</div>
-                <div class="field"><strong>Delivery Type:</strong> ${applicant["Application.Delivery Type"]}</div>
-                <div class="field"><strong>Education History:</strong>
-                  <ul>
-                    <li>
-                      Institution 1: ${applicant["Institution 1"] !== "NA" ? applicant["Institution 1"] : "N/A"}, 
-                      GPA: ${applicant["GPA"] !== "NA" ? applicant["GPA"] : "N/A"}, 
-                      Degree: ${applicant["Degree"] !== "NA" ? applicant["Degree"] : "N/A"}, 
-                      Subject: ${applicant["Subject Area"] !== "NA" ? applicant["Subject Area"] : "N/A"}
-                    </li>
-                    ${applicant["Institution 2"] !== "NA" ? `
-                      <li>
-                        Institution 2: ${applicant["Institution 2"]}, 
-                        GPA: ${applicant["GPA 2"] !== "NA" ? applicant["GPA 2"] : "N/A"}, 
-                        Degree: ${applicant["Degree 2"] !== "NA" ? applicant["Degree 2"] : "N/A"}, 
-                        Subject: ${applicant["Subject Area 2"] !== "NA" ? applicant["Subject Area 2"] : "N/A"}
-                      </li>
-                    ` : ""}
-                    ${applicant["Institution 3"] && applicant["Institution 3"] !== "NA" ? `
-                      <li>
-                        Institution 3: ${applicant["Institution 3"]}, 
-                        GPA: ${applicant["GPA 3"] || "N/A"}, 
-                        Degree: ${applicant["Degree 3"] || "N/A"}, 
-                        Subject: ${applicant["Subject Area 3"] || "N/A"}
-                      </li>
-                    ` : ""}
-                  </ul>
-                </div>
-                <div class="field"><strong>GRE Scores:</strong> 
-                  Verbal: ${applicant["GRE Verbal"] !== "NA" ? applicant["GRE Verbal"] : "N/A"}, 
-                  Quantitative: ${applicant["GRE Quantitative"] !== "NA" ? applicant["GRE Quantitative"] : "N/A"}
-                </div>
-                <div class="field"><strong>English Proficiency:</strong> 
-                  ${applicant["English Proficiency"] !== "NA" ? applicant["English Proficiency"] : "N/A"}: 
-                  ${applicant["Score"] !== "NA" ? applicant["Score"] : "N/A"}
-                </div>
-              </div>
-            `).join('');
-          } else {
-            applicantList.innerHTML = "<p>No applicants found for this country.</p>";
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching applicants:', error);
-          document.getElementById('applicantList').innerHTML = `<p>Error loading applicant data: ${error.message}</p>`;
-        });
-    } else {
-      document.getElementById('countryName').textContent = "Unknown Country";
-      document.getElementById('applicantList').innerHTML = "<p>No country selected.</p>";
-    }
-  </script>
+            fetch('PhD_Applications.json')
+                .then(response => response.json())
+                .then(applicants => {
+                    const countryApplicants = applicants.filter(a => a["Citizenship Country"].trim() === decodedCountry || (a["Citizenship Country"].trim() === "NA" && decodedCountry === "USA"));
+
+                    // Calculate statistics
+                    const totalApplicants = countryApplicants.length;
+                    const averageGPA = countryApplicants.reduce((acc, a) => {
+                        const gpa = parseFloat(a.GPA);
+                        return acc + (isNaN(gpa) ? 0 : gpa);
+                    }, 0) / totalApplicants || 0;
+
+                    const programCounts = countryApplicants.reduce((acc, a) => {
+                        acc[a["Program Name"]] = (acc[a["Program Name"]] || 0) + 1;
+                        return acc;
+                    }, {});
+
+                    // Display statistics
+                    const statisticsDiv = document.getElementById('statistics');
+                    statisticsDiv.innerHTML = `
+                        <div class="statistic"><strong>Total Applicants:</strong> ${totalApplicants}</div>
+                        <div class="statistic"><strong>Average GPA:</strong> ${averageGPA.toFixed(2)}</div>
+                        <div class="statistic"><strong>Program Distribution:</strong> ${Object.entries(programCounts).map(([program, count]) => `${program}: ${count}`).join(', ')}</div>
+                    `;
+
+                    // Display applicant list
+                    const applicantList = document.getElementById('applicantList');
+                    if (countryApplicants.length > 0) {
+                        applicantList.innerHTML = countryApplicants.map(applicant => `
+                            <div class="applicant">
+                                <div class="field"><strong>Application ID:</strong> ${applicant["Application ID"]}</div>
+                                <div class="field"><strong>Intended Term:</strong> ${applicant["Intended Term"]}</div>
+                                <div class="field"><strong>Program Name:</strong> ${applicant["Program Name"]}</div>
+                                <div class="field"><strong>Student Type:</strong> ${applicant["Student Type"]}</div>
+                                <div class="field"><strong>Applicant Type:</strong> ${applicant["Applicant Type"]}</div>
+                                <div class="field"><strong>Review Date:</strong> ${applicant["Review Date"] || "N/A"}</div>
+                                <div class="field"><strong>Delivery Type:</strong> ${applicant["Application.Delivery Type"]}</div>
+                                <div class="field"><strong>Education History:</strong>
+                                    <ul>
+                                        <li>Institution 1: ${applicant["Institution 1"] !== "NA" ? applicant["Institution 1"] : "N/A"}, GPA: ${applicant["GPA"] !== "NA" ? applicant["GPA"] : "N/A"}, Degree: ${applicant["Degree"] !== "NA" ? applicant["Degree"] : "N/A"}, Subject: ${applicant["Subject Area"] !== "NA" ? applicant["Subject Area"] : "N/A"}</li>
+                                       ${applicant["Institution 2"] !== "NA" ? `<li>Institution 2: ${applicant["Institution 2"]}, GPA: ${applicant["GPA 2"] !== "NA" ? applicant["GPA 2"] : "N/A"}, Degree: ${applicant["Degree 2"] !== "NA" ? applicant["Degree 2"] : "N/A"}, Subject: ${applicant["Subject Area 2"] !== "NA" ? applicant["Subject Area 2"] : "N/A"}</li>` : ""}
+                                        ${applicant["Institution 3"] && applicant["Institution 3"] !== "NA" ? `<li>Institution 3: ${applicant["Institution 3"]}, GPA: ${applicant["GPA 3"] || "N/A"}, Degree: ${applicant["Degree 3"] || "N/A"}, Subject: ${applicant["Subject Area 3"] || "N/A"}</li>` : ""}
+                                    </ul>
+                                </div>
+                                <div class="field"><strong>GRE Scores:</strong> Verbal: ${applicant["GRE Verbal"] !== "NA" ? applicant["GRE Verbal"] : "N/A"}, Quantitative: ${applicant["GRE Quantitative"] !== "NA" ? applicant["GRE Quantitative"] : "N/A"}</div>
+                                <div class="field"><strong>English Proficiency:</strong> ${applicant["English Proficiency"] !== "NA" ? applicant["English Proficiency"] : "N/A"}: ${applicant["Score"] !== "NA" ? applicant["Score"] : "N/A"}</div>
+                            </div>
+                        `).join('');
+                    } else {
+                        applicantList.innerHTML = "<p>No applicants found for this country.</p>";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching applicants:', error);
+                    document.getElementById('applicantList').innerHTML = `<p>Error loading applicant data: ${error.message}</p>`;
+                });
+        } else {
+            document.getElementById('countryName').textContent = "Unknown Country";
+            document.getElementById('applicantList').innerHTML = "<p>No country selected.</p>";
+        }
+    </script>
 </body>
 </html>
