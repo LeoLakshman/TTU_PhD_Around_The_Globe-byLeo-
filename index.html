@@ -125,13 +125,13 @@
             .labelColor(() => 'rgba(255, 215, 0, 0.75)')
             .labelAltitude(0.02)
             .labelLabel(d => `
-                <button class="country-button"> title ="${d.name}">
-                    <span class="math-inline">\{d\.name\}
-<div class\="flag\-tooltip"\>
-<img src\="https\://flagcdn\.com/w40/</span>{d.code}.png" alt="${d.name} flag">
-                    </div>
-                </button>
-            `)
+    <button class="country-button" title="${d.name}">
+        ${d.name}
+        <div class="flag-tooltip">
+            <img src="https://flagcdn.com/w40/${d.code}.png" alt="${d.name} flag">
+        </div>
+    </button>
+`)
             .onLabelClick((label) => {
                 const redirectName = (label.name === "NA") ? "USA" : label.name;
                 window.location.href = `country.html?country=${encodeURIComponent(redirectName)}`;
