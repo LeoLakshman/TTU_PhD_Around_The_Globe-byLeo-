@@ -63,11 +63,13 @@
             background: rgba(0, 0, 0, 0.7);
             color: #fff;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 0;
             z-index: 100;
             font-family: 'Playfair Display', serif;
-            display: flex;
-            flex-direction: column;
+           width: 350px; /* Adjust width as needed */
+    height: 100vh; /* Make height match the globe */
+    overflow-y: auto; /* Allow vertical scrolling if content overflows */
+    box-sizing: border-box;
         }
 
         .chartContainer {
